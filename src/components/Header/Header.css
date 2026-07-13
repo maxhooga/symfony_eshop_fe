@@ -55,7 +55,13 @@
   border-radius: 50%;
   background: var(--bg);
   color: var(--text-muted);
-  cursor: not-allowed;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.header__icon-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 @media (max-width: 640px) {

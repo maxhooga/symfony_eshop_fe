@@ -1,12 +1,13 @@
+import { Link } from 'react-router-dom'
 import './Header.css'
 
 export function Header() {
   return (
     <header className="header">
       <div className="header__inner">
-        <a href="/" className="header__logo">
+        <Link to="/" className="header__logo">
           E-SHOP
-        </a>
+        </Link>
 
         <div className="header__search">
           <input
@@ -19,9 +20,9 @@ export function Header() {
         </div>
 
         <nav className="header__actions" aria-label="Uživatelské akce">
-          <button type="button" className="header__icon-btn" aria-label="Košík" disabled>
+          <Link to="/cart" className="header__icon-btn" aria-label="Košík">
             <CartIcon />
-          </button>
+          </Link>
         </nav>
       </div>
     </header>

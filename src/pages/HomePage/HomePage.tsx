@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { getProducts } from '../../api/products'
 import type { Product } from '../../types/product'
-import { Header } from '../../components/Header/Header'
 import { ProductList } from '../../components/ProductList/ProductList'
 import './HomePage.css'
 
@@ -41,10 +40,8 @@ export function HomePage() {
   }, [])
 
   return (
-    <div className="home-page">
-      <Header />
-
-      <main className="home-page__main">
+    <main className="home-page">
+      <div className="home-page__main">
         <div className="home-page__layout">
           <aside className="home-page__sidebar" aria-label="Kategorie">
             <h2>Kategorie</h2>
@@ -66,7 +63,7 @@ export function HomePage() {
             {!loading && !error && <ProductList products={products} />}
           </section>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }
