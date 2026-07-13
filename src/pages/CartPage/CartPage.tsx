@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { getCart } from '../../api/cart'
+import { getCart, removeCartItem, updateCartItemQuantity } from '../../api/cart'
 import { CartItemRow } from '../../components/CartItemRow/CartItemRow'
 import type { Cart } from '../../types/cart'
 import { formatPrice } from '../../utils/formatPrice'
@@ -11,16 +11,18 @@ export function CartPage() {
   const [cart, setCart] = useState<Cart | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingProductId, setUpdatingProductId] = useState<number | null>(null)
+
+  const loadCart = useCallback(async () => {
+    const data = await getCart()
+    setCart(data)
+    return data
+  }, [])
 
   useEffect(() => {
     let cancelled = false
 
-    getCart()
-      .then((data) => {
-        if (!cancelled) {
-          setCart(data)
-        }
-      })
+    loadCart()
       .catch((err: unknown) => {
         if (!cancelled) {
           if (axios.isAxiosError(err)) {
@@ -39,7 +41,52 @@ export function CartPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [loadCart])
+
+  const handleCartUpdate = async (productId: number, action: () => Promise<Cart>) => {
+    setUpdatingProductId(productId)
+    setError(null)
+
+    try {
+      const updated = await action()
+      setCart(updated)
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError('Nepodařilo se upravit košík.')
+      } else {
+        setError('Něco se pokazilo.')
+      }
+    } finally {
+      setUpdatingProductId(null)
+    }
+  }
+
+  const handleIncrease = (productId: number) => {
+    const item = cart?.items.find((entry) => entry.productId === productId)
+    if (!item) {
+      return
+    }
+
+    void handleCartUpdate(productId, () => updateCartItemQuantity(productId, item.quantity + 1))
+  }
+
+  const handleDecrease = (productId: number) => {
+    const item = cart?.items.find((entry) => entry.productId === productId)
+    if (!item) {
+      return
+    }
+
+    if (item.quantity <= 1) {
+      void handleCartUpdate(productId, () => removeCartItem(productId))
+      return
+    }
+
+    void handleCartUpdate(productId, () => updateCartItemQuantity(productId, item.quantity - 1))
+  }
+
+  const handleRemove = (productId: number) => {
+    void handleCartUpdate(productId, () => removeCartItem(productId))
+  }
 
   return (
     <main className="cart-page">
@@ -62,7 +109,7 @@ export function CartPage() {
         </div>
       )}
 
-      {!loading && !error && cart && cart.items.length > 0 && (
+      {!loading && cart && cart.items.length > 0 && (
         <div className="cart-page__content">
           <div className="cart-page__table-wrap">
             <table className="cart-page__table">
@@ -76,7 +123,14 @@ export function CartPage() {
               </thead>
               <tbody>
                 {cart.items.map((item) => (
-                  <CartItemRow key={item.productId} item={item} />
+                  <CartItemRow
+                    key={item.productId}
+                    item={item}
+                    disabled={updatingProductId !== null}
+                    onIncrease={handleIncrease}
+                    onDecrease={handleDecrease}
+                    onRemove={handleRemove}
+                  />
                 ))}
               </tbody>
             </table>

@@ -18,3 +18,11 @@ export async function addProductToCart(productId: number, quantityToAdd: number)
 
   return setCartItem(productId, quantity)
 }
+
+export async function updateCartItemQuantity(productId: number, quantity: number): Promise<Cart> {
+  return setCartItem(productId, quantity)
+}
+
+export async function removeCartItem(productId: number): Promise<Cart> {
+  return setCartItem(productId, 0)
+}
