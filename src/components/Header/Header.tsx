@@ -20,7 +20,7 @@ export function Header() {
         </div>
 
         <nav className="header__actions" aria-label="Uživatelské akce">
-          <Link to="/cart" className="header__icon-btn" aria-label="Košík">
+          <Link to="/checkout" className="header__icon-btn" aria-label="Košík">
             <CartIcon />
           </Link>
         </nav>
