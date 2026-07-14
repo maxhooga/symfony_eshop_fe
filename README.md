@@ -1,32 +1,80 @@
-# React + TypeScript + Vite
+# Symfony E-shop — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + TypeScript + Vite. Napojeno na Symfony REST API.
 
-Currently, two official plugins are available:
+## Požadavky
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Docker Desktop / Docker Engine + Compose v2
+- Běžící backend API (viz [`symfony_eshop_be`](../symfony_eshop_be))
 
-## React Compiler
+## Spuštění celého projektu
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Backend (v prvním terminálu)
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+cd symfony_eshop_be
+docker compose up --build -d
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+API: http://localhost:8000
+
+Volitelně načti testovací produkty:
+
+```bash
+docker compose exec app php bin/console doctrine:fixtures:load --no-interaction
+```
+
+### 2. Frontend (v druhém terminálu)
+
+```bash
+cd symfony_eshop_fe
+docker compose up --build
+```
+
+E-shop: http://localhost:5173
+
+## Spuštění pouze frontendu (Docker)
+
+Backend musí už běžet (Docker nebo lokálně na portu `8000`).
+
+```bash
+docker compose up --build
+```
+
+Frontend proxy `/api` → `http://host.docker.internal:8000`
+
+### Užitečné příkazy
+
+```bash
+# Na pozadí
+docker compose up --build -d
+
+# Logy
+docker compose logs -f
+
+# Zastavit
+docker compose down
+```
+
+### Jiný port backendu
+
+```bash
+VITE_PROXY_TARGET=http://host.docker.internal:8080 docker compose up --build
+```
+
+## Lokální vývoj (bez Dockeru)
+
+```bash
+npm install
+npm run dev
+```
+
+Backend musí běžet na http://127.0.0.1:8000 — Vite proxy `/api` funguje automaticky.
+
+## Troubleshooting
+
+| Problém | Řešení |
+|---------|--------|
+| Port `5173` obsazený | Zastav lokální `npm run dev` nebo `APP_PORT=5174 docker compose up` |
+| API neodpovídá | Ověř, že backend běží: `curl http://localhost:8000/api/products` |
+| Prázdný košík / CORS | Backend i frontend musí běžet; používej http://localhost:5173 |
