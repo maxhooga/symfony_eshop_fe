@@ -1,3 +1,5 @@
+import type { ShippingMethod } from './checkout'
+
 export type OrderItem = {
   id: number
   productId: number | null
@@ -9,11 +11,15 @@ export type OrderItem = {
 
 export type Order = {
   id: number
+  fullName: string
   email: string | null
   mobile: string
   street: string
   city: string
   postalCode: string
+  shippingMethod: ShippingMethod
+  shippingPriceInCents: number
+  itemsSubtotalInCents: number
   totalInCents: number
   status: string
   createdAt: string
@@ -21,9 +27,11 @@ export type Order = {
 }
 
 export type CreateOrderPayload = {
+  fullName: string
   mobile: string
   email?: string | null
   street: string
   city: string
   postalCode: string
+  shippingMethod: ShippingMethod
 }

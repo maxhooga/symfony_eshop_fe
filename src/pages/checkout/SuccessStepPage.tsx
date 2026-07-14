@@ -15,6 +15,10 @@ export function SuccessStepPage() {
       <p>Děkujeme za nákup. Objednávku jsme úspěšně přijali.</p>
       <p className="checkout__success-order-id">Číslo objednávky: #{createdOrder.id}</p>
       <p>
+        Zboží: {formatPrice(createdOrder.itemsSubtotalInCents)}
+        <br />
+        Doprava: {createdOrder.shippingPriceInCents === 0 ? 'Zdarma' : formatPrice(createdOrder.shippingPriceInCents)}
+        <br />
         Celkem: <strong>{formatPrice(createdOrder.totalInCents)}</strong>
       </p>
       <Link

@@ -51,11 +51,13 @@ export function ShippingStepPage() {
 
     try {
       const order = await createOrder({
+        fullName: `${customer.firstName.trim()} ${customer.lastName.trim()}`,
         mobile: customer.phone.trim(),
         email: customer.email.trim() || null,
-        street: `${customer.firstName.trim()} ${customer.lastName.trim()}, ${customer.street.trim()}`,
+        street: customer.street.trim(),
         city: customer.city.trim(),
         postalCode: customer.postalCode.trim(),
+        shippingMethod,
       })
 
       setCreatedOrder(order)
